@@ -1,10 +1,15 @@
 <template>
   <div class="methodCard">
-    <Card :title="data.methodName" hoverable>
+    <Card hoverable>
       <div class="cardMain">
         <div class="beanName">{{ data.className }}</div>
         <div class="methodDesc">{{ data.methodDesc }}</div>
       </div>
+      <template #title>
+        <div class="methodTitle">
+          <img src="@/assets/funciton.png" alt="" /> {{ data.methodName }}
+        </div>
+      </template>
       <template #actions>
         <Tooltip title="点击执行">
           <div class="actionIcon">
@@ -19,25 +24,39 @@
 <script lang="ts" setup>
 import { Card, Tooltip } from "ant-design-vue";
 import { PlayCircleOutlined } from "@ant-design/icons-vue";
+import type { ServiceItemType } from "@/interface/service";
 
 defineProps<{
-  data: any;
+  data: ServiceItemType;
 }>();
 
 const emits = defineEmits(["openMethodDrawer"]);
 </script>
 
 <style scoped lang="scss">
+@import "@/style/variable.scss";
+
 .methodCard {
   width: 300px;
   margin-right: 12px;
   margin-bottom: 12px;
+
+  .methodTitle {
+    display: flex;
+    font-family: $basic-font-family;
+    img {
+      width: 24px;
+      height: 24px;
+      margin-right: 6px;
+    }
+  }
   .cardMain {
     height: 40px;
     overflow: auto;
     .beanName {
       font-size: 12px;
       color: #999;
+      font-family: $basic-font-family;
     }
   }
   .actionIcon {

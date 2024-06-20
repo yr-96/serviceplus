@@ -1,7 +1,7 @@
 <template>
   <div class="serviceDetail">
     <div class="header">
-      <div class="back" @click="router.go(-1)">
+      <div class="back" @click="router.push('/')">
         <LeftOutlined />
       </div>
       <div class="appName">
@@ -9,11 +9,34 @@
       </div>
       <div class="ip">
         {{ ip }}
+        <Popover placement="rightTop" title="切换 ip " trigger="click">
+          <template #content>
+            <div class="switchIP">
+              <p
+                v-for="ipItem in ips"
+                :key="ipItem"
+                @click="goServiceDetail(ipItem)"
+              >
+                {{ ipItem }}
+              </p>
+            </div>
+          </template>
+          <SwapOutlined />
+        </Popover>
+      </div>
+      <div class="port">
+        <Tag color="blue">
+          {{ applicationPort }}
+        </Tag>
       </div>
     </div>
     <main>
       <div class="search">
-        <Input placeholder="请输入搜索内容" @change="handleSearch" />
+        <Input placeholder="请输入搜索内容" @change="handleSearch">
+          <template #prefix>
+            <SearchOutlined />
+          </template>
+        </Input>
       </div>
       <div class="result">
         <MethodCard
@@ -34,8 +57,12 @@
 </template>
 <script setup lang="ts">
 import { useRoute, useRouter } from "vue-router";
-import { LeftOutlined } from "@ant-design/icons-vue";
-import { Input } from "ant-design-vue";
+import {
+  LeftOutlined,
+  SearchOutlined,
+  SwapOutlined,
+} from "@ant-design/icons-vue";
+import { Input, Tag, Popover } from "ant-design-vue";
 import { ref } from "vue";
 import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 
@@ -44,6 +71,8 @@ import MethodDrawer from "./components/MethodDrawer.vue";
 import { fetchServiceDetail } from "@/service/service.js";
 
 import type { ServiceItemType } from "@/interface/service";
+
+import { toServiceDetail } from "@/route/routerMethod";
 
 const route = useRoute();
 const router = useRouter();
@@ -55,6 +84,8 @@ let orginalData: ServiceItemType[] = [];
 const displayData = ref<ServiceItemType[]>([]);
 const methodDrawerVisible = ref(false);
 const methodItem = ref<ServiceItemType>();
+
+const ips = ref<string[]>([]);
 
 const handleSearch = (e: ChangeEvent) => {
   const value = (e.target.value || "").toLowerCase();
@@ -82,12 +113,17 @@ const hanldeMethodClose = () => {
 const init = async () => {
   try {
     const res = await fetchServiceDetail(appName, ip, applicationPort);
-    displayData.value = res;
-    orginalData = res;
+    displayData.value = res.serviceList;
+    orginalData = res.serviceList;
+    ips.value = res.ipList;
   } catch (error) {}
 };
 
 init();
+
+const goServiceDetail = (ip: string) => {
+  toServiceDetail(ip, appName, applicationPort);
+};
 </script>
 <style scoped lang="scss">
 @import "@/style/variable.scss";
@@ -107,9 +143,14 @@ init();
     }
     .appName {
       font-size: 24px;
+      font-weight: bold;
     }
     .ip {
       font-size: 16px;
+      .anticon {
+        cursor: pointer;
+        font-size: 12px;
+      }
     }
   }
   main {
@@ -121,6 +162,18 @@ init();
       margin-top: 12px;
       display: flex;
       flex-wrap: wrap;
+    }
+  }
+}
+
+.switchIP {
+  max-height: 170px;
+  overflow-y: auto;
+  p {
+    cursor: pointer;
+    margin-bottom: 4px;
+    &:hover {
+      color: $color4;
     }
   }
 }

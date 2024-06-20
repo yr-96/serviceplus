@@ -2,7 +2,9 @@
   <div class="appListPage">
     <div class="applistHeader">应用</div>
     <div class="search">
-      <Input placeholder="请输入搜索内容" @change="handleSearch" />
+      <Input placeholder="请输入搜索内容" @change="handleSearch">
+        <template #prefix> <SearchOutlined /> </template>
+      </Input>
     </div>
     <div class="appContent">
       <div class="loading" v-if="loading">
@@ -30,6 +32,8 @@ import AppItem from "./components/AppItem.vue";
 import { fetchAppList } from "@/service/app";
 import type { AppItemType } from "@/interface/app";
 import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
+import { SearchOutlined } from "@ant-design/icons-vue";
+
 
 const appList = ref<AppItemType[]>([]);
 let orginalData: AppItemType[] = [];

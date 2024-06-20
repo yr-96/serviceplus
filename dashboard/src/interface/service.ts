@@ -12,3 +12,9 @@ export interface ServiceItemType {
   returnType: string;
   simpleClassName: string;
 }
+
+export interface SerivceListType {
+  applicationName: string;
+  ipList: string[];
+  serviceList: ServiceItemType[];
+}

@@ -23,6 +23,8 @@ async function responseInterceptor(response: any) {
       const data = await response.json();
       if (data.code === 0) {
         return data.data;
+      } else if (data.code === 200) {
+        return data.result;
       } else {
         throw new Error(data.message);
       }

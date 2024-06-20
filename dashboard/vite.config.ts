@@ -18,6 +18,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
+      "/external_oioweb/api": {
+        target: "https://api.oioweb.cn",
+        // changeOrigin: true,
+        rewrite:(path) => path.replace(/^\/external_oioweb/, ""),
+      },
     },
   },
 });

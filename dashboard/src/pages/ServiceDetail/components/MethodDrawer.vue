@@ -15,6 +15,7 @@
         :columns="columns"
         :dataSource="methodItem.paramInfos"
         :pagination="false"
+        :locale="{ emptyText: '无入参' }"
       >
         <template #bodyCell="{ column }">
           <template v-if="column.dataIndex === 'value'">
