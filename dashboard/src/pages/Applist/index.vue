@@ -1,37 +1,64 @@
 <template>
   <div class="appListPage">
     <div class="applistHeader">应用</div>
-    <div class="applist">
-      <AppItem
-        v-for="item in appList"
-        :appName="item"
-        :key="item"
-        :ips="ips"
-        class="applistItem"
-      />
+    <div class="search">
+      <Input placeholder="请输入搜索内容" @change="handleSearch" />
+    </div>
+    <div class="appContent">
+      <div class="loading" v-if="loading">
+        <Spin size="large" />
+      </div>
+      <div class="applist" v-else-if="appList.length">
+        <AppItem
+          v-for="item in appList"
+          :key="item.applicationName"
+          :appInfo="item"
+          class="applistItem"
+        />
+      </div>
+      <div class="applistEmpty" v-else>
+        <Empty description="暂无应用" />
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { ref } from "vue";
+import { Spin, Empty, Input } from "ant-design-vue";
 import AppItem from "./components/AppItem.vue";
 
-const appList = new Array(11)
-  .fill("")
-  .map(() => "app" + Math.round(Math.random() * 100));
+import { fetchAppList } from "@/service/app";
+import type { AppItemType } from "@/interface/app";
+import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 
-const ips = [
-  "127.0.0.1",
-  "127.0.0.2",
-  "127.0.0.3",
-  "127.0.0.4",
-  "127.0.0.5",
-  "127.0.0.6",
-  "127.0.0.7",
-  "127.0.0.8",
-  "127.0.0.9",
-  "127.0.0.10",
-  "127.0.0.11",
-];
+const appList = ref<AppItemType[]>([]);
+let orginalData: AppItemType[] = [];
+const loading = ref(false);
+
+const init = async () => {
+  try {
+    loading.value = true;
+    const res = await fetchAppList();
+    appList.value = res;
+    orginalData = res;
+  } catch (error) {
+  } finally {
+    loading.value = false;
+  }
+};
+
+init();
+
+const handleSearch = (e: ChangeEvent) => {
+  const value = e.target.value || "";
+  const filterData = orginalData.filter((item) => {
+    return (
+      item.applicationName.includes(value) ||
+      item.ipList.some((ip) => ip.includes(value))
+    );
+  });
+  appList.value = filterData;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -60,32 +87,24 @@ const ips = [
       border-radius: 0 4px;
     }
   }
-  .applist {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    .applistItem {
-      width: 25%;
-      height: 228px;
-      overflow: hidden;
-      padding: 16px;
-      border-bottom: 1px solid $divider-color;
-      border-right: 1px solid $divider-color;
-      box-sizing: border-box;
-      transition: box-shadow 0.3s;
-      &:hover {
-        box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16),
-          0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
-      }
+  .search {
+    width: 200px;
+    margin-left: 24px;
+    margin-top: 24px;
+  }
+  .appContent {
+    padding: 24px;
+    .applist {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
     }
-    .applistItem:nth-child(4n) {
-      border-right: none;
-    }
-    .applistItem:nth-child(4n + 1):nth-last-child(-n + 4) {
-      border-bottom: none;
-    }
-    .applistItem:nth-child(4n + 1):nth-last-child(-n + 4) ~ .applistItem {
-      border-bottom: none;
+    .loading {
+      margin: auto;
+      padding: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }

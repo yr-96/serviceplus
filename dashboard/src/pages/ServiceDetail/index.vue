@@ -18,7 +18,7 @@
       <div class="result">
         <MethodCard
           v-for="item in displayData"
-          :key="item.id"
+          :key="item.methodName"
           :data="item"
           @openMethodDrawer="handleOpenMethodDrawer(item)"
         />
@@ -39,28 +39,32 @@ import { Input } from "ant-design-vue";
 import { ref } from "vue";
 import type { ChangeEvent } from "ant-design-vue/es/_util/EventInterface";
 
-import mockData from "./mock.js";
 import MethodCard from "./components/MethodCard.vue";
 import MethodDrawer from "./components/MethodDrawer.vue";
+import { fetchServiceDetail } from "@/service/service.js";
+
+import type { ServiceItemType } from "@/interface/service";
 
 const route = useRoute();
 const router = useRouter();
-const { ip, appName } = route.query || { ip: "", appName: "" };
+const ip = (route.query?.ip || "") as string;
+const appName = (route.query?.appName || "") as string;
+const applicationPort = (route.query?.applicationPort || "") as string;
 
-const orginalData = mockData;
-const displayData = ref(mockData);
+let orginalData: ServiceItemType[] = [];
+const displayData = ref<ServiceItemType[]>([]);
 const methodDrawerVisible = ref(false);
-const methodItem = ref<any>(null);
+const methodItem = ref<ServiceItemType>();
 
 const handleSearch = (e: ChangeEvent) => {
-  const value = e.target.value;
-  displayData.value = orginalData.filter((item: any) => {
-    const { beanName, methodDesc, methodSignature } = item;
+  const value = (e.target.value || "").toLowerCase();
+  displayData.value = orginalData.filter((item: ServiceItemType) => {
+    const { className, methodDesc, methodName } = item;
 
     return (
-      beanName.includes(value) ||
-      methodDesc.includes(value) ||
-      methodSignature.includes(value)
+      className.toLowerCase().includes(value) ||
+      methodDesc.toLowerCase().includes(value) ||
+      methodName.toLowerCase().includes(value)
     );
   });
 };
@@ -72,8 +76,18 @@ const handleOpenMethodDrawer = (item: any) => {
 
 const hanldeMethodClose = () => {
   methodDrawerVisible.value = false;
-  methodItem.value = null;
+  methodItem.value = undefined;
 };
+
+const init = async () => {
+  try {
+    const res = await fetchServiceDetail(appName, ip, applicationPort);
+    displayData.value = res;
+    orginalData = res;
+  } catch (error) {}
+};
+
+init();
 </script>
 <style scoped lang="scss">
 @import "@/style/variable.scss";

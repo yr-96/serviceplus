@@ -1,12 +1,15 @@
 <template>
   <div class="methodCard">
-    <Card :title="data.methodSignature" hoverable>
-      <div class="beanName">{{ data.beanName }}</div>
-      <div class="methodDesc">{{ data.methodDesc }}</div>
-
+    <Card :title="data.methodName" hoverable>
+      <div class="cardMain">
+        <div class="beanName">{{ data.className }}</div>
+        <div class="methodDesc">{{ data.methodDesc }}</div>
+      </div>
       <template #actions>
         <Tooltip title="点击执行">
-          <PlayCircleOutlined @click="emits('openMethodDrawer')" />
+          <div class="actionIcon">
+            <PlayCircleOutlined @click="emits('openMethodDrawer')" />
+          </div>
         </Tooltip>
       </template>
     </Card>
@@ -29,9 +32,35 @@ const emits = defineEmits(["openMethodDrawer"]);
   width: 300px;
   margin-right: 12px;
   margin-bottom: 12px;
-  .beanName {
-    font-size: 12px;
-    color: #999;
+  .cardMain {
+    height: 40px;
+    overflow: auto;
+    .beanName {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+  .actionIcon {
+    .anticon :hover {
+      animation: shake 0.3s;
+      animation-iteration-count: 1;
+    }
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-1px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(1px);
   }
 }
 </style>

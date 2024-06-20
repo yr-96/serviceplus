@@ -2,7 +2,7 @@
   <Drawer
     :open="visible"
     @close="emits('close')"
-    :title="methodItem.methodSignature"
+    :title="methodItem.methodName"
     width="80%"
   >
     <template #extra>
@@ -13,7 +13,7 @@
       <div class="method-sub-title">参数</div>
       <Table
         :columns="columns"
-        :dataSource="methodItem.params"
+        :dataSource="methodItem.paramInfos"
         :pagination="false"
       >
         <template #bodyCell="{ column }">
@@ -43,13 +43,14 @@
 <script lang="ts" setup>
 import { Drawer, Table, Input, Button, Divider } from "ant-design-vue";
 import VueJsonPretty from "vue-json-pretty";
+import type { ServiceItemType } from "@/interface/service";
 import "vue-json-pretty/lib/styles.css";
 
 import result from "../result.json";
 
 defineProps<{
   visible: boolean;
-  methodItem: any;
+  methodItem: ServiceItemType;
 }>();
 
 const emits = defineEmits(["close"]);
@@ -57,11 +58,11 @@ const emits = defineEmits(["close"]);
 const columns = [
   {
     title: "参数名",
-    dataIndex: "desc",
+    dataIndex: "paramName",
   },
   {
     title: "参数类型",
-    dataIndex: "type",
+    dataIndex: "paramType",
   },
   {
     title: "参数值",
