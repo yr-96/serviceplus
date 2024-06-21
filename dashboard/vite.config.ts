@@ -14,14 +14,14 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://30.165.1.167:8080", // 目标服务器
+        target: "http://30.165.2.13:8080", // 目标服务器
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
       "/external_oioweb/api": {
         target: "https://api.oioweb.cn",
         // changeOrigin: true,
-        rewrite:(path) => path.replace(/^\/external_oioweb/, ""),
+        rewrite: (path) => path.replace(/^\/external_oioweb/, ""),
       },
     },
   },
